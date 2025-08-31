@@ -133,7 +133,7 @@ const fupeiApi = axios.create({
     headers: { 'X-APIKEY': ATLANTIC_API_KEY }
 });
 
-app.get('/api/layanan', async (req, res) => {
+app.get('/layanan/price_list', async (req, res) => {
     try {
         console.log('[LOG] Meminta daftar layanan dari Atlantic...');
         const response = await AtlanticApi.get('/layanan/price_list');
