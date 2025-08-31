@@ -130,7 +130,7 @@ app.delete('/produk/:id', isLoggedIn, async (req, res) => {
 
 const atlanticApi = axios.create({
     baseURL: ATLANTIC_BASE_URL,
-    headers: { 'application/x-www-form-urlencoded': ATLANTIC_API_KEY }
+    headers: { 'X-APIKEY': ATLANTIC_API_KEY }
 });
 
 app.get('/api/layanan', async (req, res) => {
