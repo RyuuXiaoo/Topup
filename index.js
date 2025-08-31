@@ -128,7 +128,7 @@ app.delete('/produk/:id', isLoggedIn, async (req, res) => {
 });
 
 
-const fupeiApi = axios.create({
+const AtlanticApi = axios.create({
     baseURL: ATLANTIC_BASE_URL,
     headers: { 'X-APIKEY': ATLANTIC_API_KEY }
 });
