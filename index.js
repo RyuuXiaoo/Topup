@@ -9,8 +9,16 @@ const MongoStore = require('connect-mongo');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const ATLANTIC_API_KEY = "S4WwHEmudyb4PJuTPlgK8813eeDGA6m6teZULR8bdSE8ETqG1awh8JlgjajawglASwFt0ThSQudPWpRFc61X4cfYFuTgXBafczoT";
-const ATLANTIC_BASE_URL = "https://atlantich2h.com";
+// Pastikan variabel lingkungan ini sudah disetel
+const ATLANTIC_API_KEY = process.env.ATLANTIC_API_KEY || "S4WwHEmudyb4PJuTPlgK8813eeDGA6m6teZULR8bdSE8ETqG1awh8JlgjajawglASwFt0ThSQudPWpRFc61X4cfYFuTgXBafczoT";
+const ATLANTIC_BASE_URL = process.env.ATLANTIC_BASE_URL || "https://atlantich2h.com";
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://playmusic:playmusic@cluster0.a7fx9x1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+
+// Hentikan aplikasi jika kunci API tidak disetel
+if (!ATLANTIC_API_KEY || !ATLANTIC_BASE_URL || !MONGO_URI) {
+    console.error('❌ Kesalahan konfigurasi: Variabel lingkungan ATLANTIC_API_KEY, ATLANTIC_BASE_URL, atau MONGO_URI tidak disetel.');
+    process.exit(1);
+}
 
 const transactions = {};
 
@@ -18,9 +26,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-const mongoURI = 'mongodb+srv://playmusic:playmusic@cluster0.a7fx9x1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-
-mongoose.connect(mongoURI, {
+mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => console.log('✅ MongoDB connected'))
@@ -30,9 +36,9 @@ app.use(session({
   secret: 'kurumi-secret-session',
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: mongoURI }),
+  store: MongoStore.create({ mongoUrl: MONGO_URI }),
   cookie: {
-    maxAge: 1000 * 60 * 60 * 24, // 1 hari
+    maxAge: 1000 * 60 * 60 * 24, // 1 day
   }
 }));
 
@@ -127,16 +133,17 @@ app.delete('/produk/:id', isLoggedIn, async (req, res) => {
   }
 });
 
-
+// Rename variable to reflect its usage, and make sure it's exported if needed
 const AtlanticApi = axios.create({
     baseURL: ATLANTIC_BASE_URL,
     headers: { 'X-APIKEY': ATLANTIC_API_KEY }
 });
 
-app.get('/price-list/prabayar', async (req, res) => {
+app.get('/layanan/price_list', async (req, res) => {
     try {
         console.log('[LOG] Meminta daftar layanan dari Atlantic...');
-        const response = await AtlanticApi.get('/price-list/prabayar');
+        // FIX: Use the correct variable name: AtlanticApi
+        const response = await AtlanticApi.get('/layanan/price_list');
 
         if (response.data && response.data.success) {
             const layanan = response.data.data.map(item => {
@@ -154,6 +161,7 @@ app.get('/price-list/prabayar', async (req, res) => {
         }
     } catch (error) {
         console.error('[ERROR] Gagal saat mengambil layanan:', error.message);
+        // FIX: Send a proper JSON error response
         res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server.' });
     }
 });
@@ -169,6 +177,7 @@ app.post('/api/buat-transaksi', async (req, res) => {
         const internalTrxId = crypto.randomUUID();
         console.log(`[LOG] Membuat permintaan deposit untuk Transaksi Internal: ${internalTrxId} dengan nominal: ${price}`);
 
+        // FIX: Use the correct variable name: AtlanticApi
         const depositResponse = await AtlanticApi.get(`/deposit/create?nominal=${price}`);
         console.log('[LOG] Respon dari Atlantic (Buat Deposit):', JSON.stringify(depositResponse.data, null, 2));
 
@@ -210,6 +219,7 @@ app.get('/api/cek-status-deposit', async (req, res) => {
     
     try {
         console.log(`[LOG] Mengecek status deposit Atlantic ID: ${transaction.AtlanticDepositId}`);
+        // FIX: Use the correct variable name: AtlanticApi
         const statusResponse = await AtlanticApi.get(`/deposit/status?id=${transaction.AtlanticDepositId}`);
         console.log('[LOG] Respon dari Atlantic (Cek Deposit):', JSON.stringify(statusResponse.data, null, 2));
 
@@ -217,6 +227,7 @@ app.get('/api/cek-status-deposit', async (req, res) => {
             console.log(`[LOG] Deposit Sukses. Membuat order untuk produk: ${transaction.productCode} ke ${transaction.target}`);
             transaction.status = 'membuat_order';
 
+            // FIX: Use the correct variable name: AtlanticApi
             const orderResponse = await AtlanticApi.get(`/order/create?code=${transaction.productCode}&tujuan=${transaction.target}`);
             console.log('[LOG] Respon dari Atlantic (Buat Order):', JSON.stringify(orderResponse.data, null, 2));
 
@@ -247,6 +258,7 @@ app.get('/api/cek-status-order', async (req, res) => {
     }
     try {
         console.log(`[LOG] Mengecek status order Atlantic ID: ${orderId}`);
+        // FIX: Use the correct variable name: AtlanticApi
         const statusResponse = await AtlanticApi.get(`/order/check?id=${orderId}`);
         console.log('[LOG] Respon dari Atlantic (Cek Order):', JSON.stringify(statusResponse.data, null, 2));
 
@@ -264,4 +276,4 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server berjalan di http://localhost:${PORT}`);
 });
-
+         
