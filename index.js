@@ -136,7 +136,7 @@ const atlanticApi = axios.create({
 app.get('/api/layanan', async (req, res) => {
     try {
         console.log('[LOG] Meminta daftar layanan dari VPedia...');
-        const response = await atlanticApi.get('/layanan/price-list');
+        const response = await atlanticApi.get('/layanan/price_list');
 
         if (response.data && response.data.success) {
             const layanan = response.data.data.map(item => {
