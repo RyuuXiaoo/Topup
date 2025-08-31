@@ -10,7 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const ATLANTIC_API_KEY = "S4WwHEmudyb4PJuTPlgK8813eeDGA6m6teZULR8bdSE8ETqG1awh8JlgjajawglASwFt0ThSQudPWpRFc61X4cfYFuTgXBafczoT";
-const ATLANTIC_BASE_URL = "https://atlantich2h.com/h2h";
+const ATLANTIC_BASE_URL = "https://atlantich2h.com";
 
 const transactions = {};
 
