@@ -9,8 +9,8 @@ const MongoStore = require('connect-mongo');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const FUPEI_API_KEY = "Fupei-pedia-7f9d19y715q74d0v";
-const FUPEI_BASE_URL = "https://fupei-pedia.web.id/h2h";
+const ATLANTIC_API_KEY = "S4WwHEmudyb4PJuTPlgK8813eeDGA6m6teZULR8bdSE8ETqG1awh8JlgjajawglASwFt0ThSQudPWpRFc61X4cfYFuTgXBafczoT";
+const ATLANTIC_BASE_URL = "https://atlantich2h.com";
 
 const transactions = {};
 
@@ -128,15 +128,15 @@ app.delete('/produk/:id', isLoggedIn, async (req, res) => {
 });
 
 
-const fupeiApi = axios.create({
-    baseURL: FUPEI_BASE_URL,
-    headers: { 'X-APIKEY': FUPEI_API_KEY }
+const atlanticApi = axios.create({
+    baseURL: ATLANTIC_BASE_URL,
+    headers: { 'X-APIKEY': ATLANTIC_API_KEY }
 });
 
 app.get('/api/layanan', async (req, res) => {
     try {
         console.log('[LOG] Meminta daftar layanan dari VPedia...');
-        const response = await fupeiApi.get('/layanan/price-list');
+        const response = await atlanticApi.get('/layanan/price-list');
 
         if (response.data && response.data.success) {
             const layanan = response.data.data.map(item => {
@@ -169,7 +169,7 @@ app.post('/api/buat-transaksi', async (req, res) => {
         const internalTrxId = crypto.randomUUID();
         console.log(`[LOG] Membuat permintaan deposit untuk Transaksi Internal: ${internalTrxId} dengan nominal: ${price}`);
 
-        const depositResponse = await fupeiApi.get(`/deposit/create?nominal=${price}`);
+        const depositResponse = await atlanticApi.get(`/deposit/create?nominal=${price}`);
         console.log('[LOG] Respon dari VPedia (Buat Deposit):', JSON.stringify(depositResponse.data, null, 2));
 
         if (depositResponse.data && depositResponse.data.success) {
@@ -210,14 +210,14 @@ app.get('/api/cek-status-deposit', async (req, res) => {
     
     try {
         console.log(`[LOG] Mengecek status deposit VPedia ID: ${transaction.vPediaDepositId}`);
-        const statusResponse = await fupeiApi.get(`/deposit/status?id=${transaction.vPediaDepositId}`);
+        const statusResponse = await atlanticApi.get(`/deposit/status?id=${transaction.vPediaDepositId}`);
         console.log('[LOG] Respon dari VPedia (Cek Deposit):', JSON.stringify(statusResponse.data, null, 2));
 
         if (statusResponse.data.success && statusResponse.data.data.status === 'success') {
             console.log(`[LOG] Deposit Sukses. Membuat order untuk produk: ${transaction.productCode} ke ${transaction.target}`);
             transaction.status = 'membuat_order';
 
-            const orderResponse = await fupeiApi.get(`/order/create?code=${transaction.productCode}&tujuan=${transaction.target}`);
+            const orderResponse = await atlanticApi.get(`/order/create?code=${transaction.productCode}&tujuan=${transaction.target}`);
             console.log('[LOG] Respon dari VPedia (Buat Order):', JSON.stringify(orderResponse.data, null, 2));
 
             if (orderResponse.data && orderResponse.data.success) {
@@ -247,7 +247,7 @@ app.get('/api/cek-status-order', async (req, res) => {
     }
     try {
         console.log(`[LOG] Mengecek status order VPedia ID: ${orderId}`);
-        const statusResponse = await fupeiApi.get(`/order/check?id=${orderId}`);
+        const statusResponse = await atlanticApi.get(`/order/check?id=${orderId}`);
         console.log('[LOG] Respon dari VPedia (Cek Order):', JSON.stringify(statusResponse.data, null, 2));
 
         res.json(statusResponse.data);
@@ -264,5 +264,4 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server berjalan di http://localhost:${PORT}`);
 });
-
 
