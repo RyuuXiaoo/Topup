@@ -130,10 +130,10 @@ app.delete('/produk/:id', isLoggedIn, async (req, res) => {
 
 const atlanticApi = axios.create({
     baseURL: ATLANTIC_BASE_URL,
-    headers: { 'X-APIKEY': ATLANTIC_API_KEY }
+    headers: { 'application/x-www-form-urlencoded': ATLANTIC_API_KEY }
 });
 
-app.get('/api/layanan', async (req, res) => {
+app.get('/layanan', async (req, res) => {
     try {
         console.log('[LOG] Meminta daftar layanan dari VPedia...');
         const response = await atlanticApi.get('/layanan/price_list');
