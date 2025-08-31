@@ -10,7 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const ATLANTIC_API_KEY = "S4WwHEmudyb4PJuTPlgK8813eeDGA6m6teZULR8bdSE8ETqG1awh8JlgjajawglASwFt0ThSQudPWpRFc61X4cfYFuTgXBafczoT";
-const ATLANTIC_BASE_URL = "https://atlantich2h.com";
+const ATLANTIC_BASE_URL = "https://atlantich2h.com/h2h";
 
 const transactions = {};
 
@@ -133,7 +133,7 @@ const fupeiApi = axios.create({
     headers: { 'X-APIKEY': ATLANTIC_API_KEY }
 });
 
-app.get('https://atlantich2h.com/layanan/price_list', async (req, res) => {
+app.get('/layanan/price_list', async (req, res) => {
     try {
         console.log('[LOG] Meminta daftar layanan dari Atlantic...');
         const response = await AtlanticApi.get('/layanan/price_list');
