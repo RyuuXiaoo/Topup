@@ -133,7 +133,7 @@ const atlanticApi = axios.create({
     headers: { 'application/x-www-form-urlencoded': ATLANTIC_API_KEY }
 });
 
-app.get('/layanan', async (req, res) => {
+app.get('/api/layanan', async (req, res) => {
     try {
         console.log('[LOG] Meminta daftar layanan dari VPedia...');
         const response = await atlanticApi.get('/layanan/price_list');
