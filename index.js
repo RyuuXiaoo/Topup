@@ -133,7 +133,7 @@ const atlanticApi = axios.create({
     headers: { 'X-APIKEY': ATLANTIC_API_KEY }
 });
 
-app.get('/api/layanan', async (req, res) => {
+app.get('/api/price-list', async (req, res) => {
     try {
         console.log('[LOG] Meminta daftar layanan dari VPedia...');
         const response = await atlanticApi.get('/layanan/price_list');
@@ -264,4 +264,5 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server berjalan di http://localhost:${PORT}`);
 });
+
 
